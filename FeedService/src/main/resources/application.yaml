@@ -1,0 +1,25 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: feedservice
+
+  datasource:
+    url: jdbc:postgresql://192.168.99.100:5432/AuthDB
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: 192.168.99.100:9092
+
+logging:
+  level:
+    org:
+      hibernate: OFF

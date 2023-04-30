@@ -10,13 +10,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-@Controller
+@RestController
 public class FeedController {
 
     String jwtToken;
@@ -24,15 +24,16 @@ public class FeedController {
     @Autowired
     FeignService feignService;
 
-    @GetMapping("/current")
-    public String hello(@NonNull HttpServletRequest request) {
-        RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    RestTemplate restTemplate;
 
-        ResponseEntity<List<Post>> postsEntity= restTemplate.exchange("http://localhost:8001/post/currentUser",
+    @GetMapping("/current")
+    public List<Post> hello(@NonNull HttpServletRequest request) {
+        ResponseEntity<List<Post>> postsEntity= restTemplate.exchange("http://FEEDSERVICE/post/currentUser",
                 HttpMethod.GET, new HttpEntity<>(createHeaders(request.getHeader("Authorization"))), new ParameterizedTypeReference<List<Post>>() {});
         List<Post> posts = postsEntity.getBody();
         System.out.println(posts);
-        return "hello";
+        return posts;
     }
 
     HttpHeaders createHeaders(String header){

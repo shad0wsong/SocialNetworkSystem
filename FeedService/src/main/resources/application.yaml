@@ -1,5 +1,5 @@
 server:
-  port: 8001
+  port: 8003
 
 spring:
   application:
@@ -23,3 +23,7 @@ logging:
   level:
     org:
       hibernate: OFF
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

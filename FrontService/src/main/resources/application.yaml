@@ -1,3 +1,10 @@
+FEEDSERVICE:
+  ribbon:
+    eureka:
+      enabled: false
+    listOfServers: localhost:8001,localhost:8003
+    ServerListRefreshInterval: 2000
+
 server:
   port: 8002
 
@@ -21,3 +28,7 @@ logging:
   level:
     org:
       hibernate: OFF
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

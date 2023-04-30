@@ -23,3 +23,7 @@ logging:
   level:
     org:
       hibernate: OFF
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

@@ -29,6 +29,7 @@ public class FeedController {
 
     @GetMapping("/post/currentUser")
     public List<Post> getCurrentUserPosts() {
+        System.out.println("current post  user info");
         return postLogic.getCurrentUserPosts();
     }
 

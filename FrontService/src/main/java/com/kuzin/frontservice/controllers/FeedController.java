@@ -5,6 +5,7 @@ import com.kuzin.frontservice.feign.FeignService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,9 +28,12 @@ public class FeedController {
     @Autowired
     RestTemplate restTemplate;
 
+    @Value("${feedservice.currentUser.url}")
+    private String currentUserURl;
+
     @GetMapping("/current")
     public List<Post> hello(@NonNull HttpServletRequest request) {
-        ResponseEntity<List<Post>> postsEntity= restTemplate.exchange("http://FEEDSERVICE/post/currentUser",
+        ResponseEntity<List<Post>> postsEntity= restTemplate.exchange(currentUserURl,
                 HttpMethod.GET, new HttpEntity<>(createHeaders(request.getHeader("Authorization"))), new ParameterizedTypeReference<List<Post>>() {});
         List<Post> posts = postsEntity.getBody();
         System.out.println(posts);

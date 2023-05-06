@@ -8,8 +8,8 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
       POSTGRES_DB: AuthDB
-      PGDATA: /data/postgres
-
+    volumes :
+      - pgdata:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -29,4 +29,18 @@ services:
     container_name: zipkin
     ports:
       - "9411:9411"
+
+  redis:
+    container_name: redis
+    image: bitnami/redis
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=root
+    volumes:
+      - redisdata:/bitnami/redis/data
+
+volumes :
+  pgdata:
+  redisdata:
 

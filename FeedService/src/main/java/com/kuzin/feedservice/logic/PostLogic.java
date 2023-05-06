@@ -4,18 +4,16 @@ import com.kuzin.feedservice.dto.PostCreateRequest;
 import com.kuzin.feedservice.dto.PostEditRequest;
 import com.kuzin.feedservice.entity.Post;
 import com.kuzin.feedservice.entity.User;
-import com.kuzin.feedservice.repositories.PostRepository;
+import com.kuzin.feedservice.repositories.JpaPostRepository;
+import com.kuzin.feedservice.redis.repository.RedisPostRepository;
 import com.kuzin.feedservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.ObjectNotFoundException;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,9 +21,11 @@ import java.util.List;
 
 public class PostLogic {
 
-    private final PostRepository postRepository;
+    private final JpaPostRepository jpaPostRepository;
 
     private final UserRepository userRepository;
+
+    private final RedisPostRepository redisPostRepository;
 
     public void createPost(PostCreateRequest postCreateRequest) {
         User currentSecurityUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -37,8 +37,10 @@ public class PostLogic {
                 .base64Image(postCreateRequest.getBase64Image())
                 .user(currentUser)
                 .build();
-
-        postRepository.save(post);
+        System.out.println(post);
+        Post savedPost = jpaPostRepository.save(post);
+        System.out.println(savedPost);
+        redisPostRepository.save(savedPost);
     }
 
     public List<Post> getPostsByUserEmail(String email) {
@@ -54,12 +56,12 @@ public class PostLogic {
     }
 
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
+        return jpaPostRepository.findAll();
     }
 
     public ResponseEntity editPost(PostEditRequest request) {
         ResponseEntity responseEntity;
-        Post post = postRepository.findById(request.getId()).orElseThrow();
+        Post post = jpaPostRepository.findById(request.getId()).orElseThrow();
         User currentSecurityUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String postUser = post.getUser().getEmail();
         String currentUser= currentSecurityUser.getEmail();
@@ -67,7 +69,7 @@ public class PostLogic {
         if(currentUser.equals(postUser)) {
             post.setText(request.getText());
             post.setBase64Image(request.getBase64Image());
-            postRepository.save(post);
+            jpaPostRepository.save(post);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -77,13 +79,13 @@ public class PostLogic {
 
     public ResponseEntity deletePostById(Long id) {
         ResponseEntity responseEntity;
-        Post post = postRepository.findById(id).orElseThrow();
+        Post post = jpaPostRepository.findById(id).orElseThrow();
         User currentSecurityUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String postUser = post.getUser().getEmail();
         String currentUser= currentSecurityUser.getEmail();
 
         if(currentUser.equals(postUser)) {
-            postRepository.delete(post);
+            jpaPostRepository.delete(post);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);

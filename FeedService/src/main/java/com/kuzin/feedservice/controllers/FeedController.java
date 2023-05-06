@@ -4,8 +4,11 @@ import com.kuzin.feedservice.dto.PostCreateRequest;
 import com.kuzin.feedservice.dto.PostEditRequest;
 import com.kuzin.feedservice.entity.Post;
 import com.kuzin.feedservice.logic.PostLogic;
+import com.kuzin.feedservice.redis.entity.RedisPost;
+import com.kuzin.feedservice.redis.repository.RedisPostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +16,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@EnableCaching
 public class FeedController {
 
     private final PostLogic postLogic;
+
+    private final RedisPostRepository redisPostRepository;
 
     @PostMapping("/post/create")
     public void createPost(@RequestBody PostCreateRequest request) {
@@ -36,6 +42,22 @@ public class FeedController {
     @GetMapping("/post")
     public List<Post> getAllPosts() {
         return postLogic.getAllPosts();
+    }
+
+    @GetMapping("/post/redis")
+    public List<RedisPost> getAllRedisPosts() {
+        return redisPostRepository.findAll();
+    }
+
+    @PostMapping("/redis/{id}/delete")
+    public void deleteRedisPost(@PathVariable (value = "id") Long id) {
+        redisPostRepository.deletePost(id);
+    }
+
+    @GetMapping("/redis/{id}")
+    @Cacheable(key = "#id",value = "Post")
+    public RedisPost getPostById(@PathVariable (value = "id") Long id) {
+         return redisPostRepository.findPostById(id);
     }
 
     @PostMapping("/post/edit")

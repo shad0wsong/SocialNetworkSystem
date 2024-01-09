@@ -20,6 +20,7 @@ public class RedisPostRepository {
                 .id(post.getId())
                 .base64Image(post.getBase64Image())
                 .text(post.getText())
+                .userId(post.getUser().getId())
                 .build();
         redisTemplate.opsForHash().put("Post", redisPost.getId(), redisPost);
         return redisPost;

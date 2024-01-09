@@ -17,6 +17,7 @@ import java.io.Serializable;
 @RedisHash("Post")
 @Builder
 public class RedisPost implements Serializable {
+
     @Id
     @GeneratedValue
     Long id;
@@ -24,4 +25,6 @@ public class RedisPost implements Serializable {
     String text;
 
     String base64Image;
+
+    Long userId;
 }
